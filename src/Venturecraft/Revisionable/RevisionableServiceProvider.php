@@ -23,7 +23,8 @@ class RevisionableServiceProvider extends ServiceProvider {
      *
      * @return void
      */
-    public function boot() {
+    public function boot() 
+    {
         $this->publishes(
             [
                 __DIR__ . '/../../migrations' => database_path('migrations')
@@ -37,7 +38,8 @@ class RevisionableServiceProvider extends ServiceProvider {
      *
      * @return void
      */
-    public function register() {
+    public function register() 
+    {
         
     }
 
