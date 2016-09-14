@@ -1,10 +1,11 @@
 <img src="http://venturecraft.com.au/wp-content/uploads/2015/09/REVISIONABLE.png" style="width: 100%" alt="Revisionable" />
 
-[![Laravel 4.x](https://img.shields.io/badge/Laravel-4.x-brightgreen.svg?style=flat-square)](http://laravel.com)
-[![Laravel 5.2](https://img.shields.io/badge/Laravel-5.x-brightgreen.svg?style=flat-square)](http://laravel.com)
-[![Latest Version](https://img.shields.io/github/release/venturecraft/revisionable.svg?style=flat-square)](https://packagist.org/packages/venturecraft/revisionable)
-[![Downloads](https://img.shields.io/packagist/dt/venturecraft/revisionable.svg?style=flat-square)](https://packagist.org/packages/venturecraft/revisionable)
-[![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://tldrlegal.com/license/mit-license)
+<a href="https://packagist.org/packages/venturecraft/revisionable">
+    <img src="http://img.shields.io/github/tag/venturecraft/revisionable.svg?style=flat" style="vertical-align: text-top">
+</a>
+<a href="https://packagist.org/packages/venturecraft/revisionable">
+    <img src="http://img.shields.io/packagist/dt/venturecraft/revisionable.svg?style=flat" style="vertical-align: text-top">
+</a>
 
 Wouldn't it be nice to have a revision history for any model in your project, without having to do any work for it. By simply extending revisionable from your model, you can instantly have just that, and be able to display a history similar to this:
 
@@ -28,32 +29,24 @@ Revisionable can also now be used [as a trait](#the-new-trait-based-implementati
 
 Revisionable is installable via [composer](http://getcomposer.org/doc/00-intro.md), the details are on [packagist, here.](https://packagist.org/packages/venturecraft/revisionable)
 
-Add the following to the `require` section of your projects composer.json file:
-
-```php
-"venturecraft/revisionable": "1.*",
-```
-
-Run composer update to download the package
+Run composer require to download the package:
 
 ```
-php composer.phar update
+php composer.phar require 'venturecraft/revisionable' '~1.0'
 ```
 
-Finally, you'll also need to run migration on the package (Laravel 5.x)
+Next, append the `RevisionableServiceProvider` to your list of providers in your app config:
 
 ```
-php artisan migrate --path=vendor/venturecraft/revisionable/src/migrations
+    Venturecraft\Revisionable\RevisionableServiceProvider::class,
 ```
 
-For Laravel 4.x users:
-```
-php artisan migrate --package=venturecraft/revisionable
-```
+Finally, publish the migration & run it:
 
-> If you're going to be migrating up and down completely a lot (using `migrate:refresh`), one thing you can do instead is to copy the migration file from the package to your `app/database` folder, and change the classname from `CreateRevisionsTable` to something like `CreateRevisionTable` (without the 's', otherwise you'll get an error saying there's a duplicate class)
-
-> `cp vendor/venturecraft/revisionable/src/migrations/2013_04_09_062329_create_revisions_table.php app/database/migrations/`
+```
+php artisan vendor:publish --provider='Venturecraft\Revisionable\RevisionableServiceProvider'
+php artisan migrate
+```
 
 ## Docs
 
@@ -154,8 +147,6 @@ You can choose to ignore deletes and restores by adding `deleted_at` to your `$d
 
 To better format the output for `deleted_at` entries, you can use the `isEmpty` formatter (see <a href="#format-output">Format output</a> for an example of this.)
 
-<a name="control"></a>
-
 ### Storing creations
 By default the creation of a new model is not stored as a revision.
 Only subsequent changes to a model is stored.
@@ -165,6 +156,7 @@ If you want to store the creation as a revision you can override this behavior b
 protected $revisionCreationsEnabled = true;
 ```
 
+<a name="control"></a>
 ## More control
 
 No doubt, there'll be cases where you don't want to store a revision history only for certain fields of the model, this is supported in two different ways. In your model you can either specifiy which fields you explicitly want to track and all other fields are ignored:
@@ -184,25 +176,6 @@ protected $dontKeepRevisionOf = array(
 ```
 
 > The `$keepRevisionOf` setting takes precendence over `$dontKeepRevisionOf`
-
-### Events
-
-Every time a model revision is created an event is fired. You can listen for `revisionable.created`,  
-`revisionable.saved` or `revisionable.deleted`.
-
-```php
-// app/Providers/EventServiceProviders.php
-public function boot(DispatcherContract $events)
-{
-    parent::boot($events);
-
-    $events->listen('revisionable.*', function($model, $revisions) {
-        // Do something with the revisions or the changed model. 
-        dd($model, $revisions);
-    });
-}
-
-```
 
 <a name="formatoutput"></a>
 ## Format output
@@ -363,7 +336,7 @@ $object->disableRevisionField(array('title', 'content')); // Disables title and 
 ## Contributing
 
 Contributions are encouraged and welcome; to keep things organised, all bugs and requests should be
-opened in the GitHub issues tab for the main project, at [venturecraft/revisionable/issues](https://github.com/venturecraft/revisionable/issues)
+opened in the github issues tab for the main project, at [venturecraft/revisionable/issues](https://github.com/venturecraft/revisionable/issues)
 
 All pull requests should be made to the develop branch, so they can be tested before being merged into the master branch.
 
@@ -373,6 +346,6 @@ All pull requests should be made to the develop branch, so they can be tested be
 If you're having troubles with using this package, odds on someone else has already had the same problem. Two places you can look for common answers to your problems are:
 
 * [StackOverflow revisionable tag](http://stackoverflow.com/questions/tagged/revisionable?sort=newest&pageSize=50)
-* [GitHub Issues](https://github.com/VentureCraft/revisionable/issues?page=1&state=closed)
+* [Github Issues](https://github.com/VentureCraft/revisionable/issues?page=1&state=closed)
 
 > If you do prefer posting your questions to the public on StackOverflow, please use the 'revisionable' tag.

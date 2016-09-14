@@ -79,7 +79,11 @@ class Revisionable extends Eloquent
      */
     public function revisionHistory()
     {
-        return $this->morphMany('\Venturecraft\Revisionable\Revision', 'revisionable');
+        $actualClassname = get_class( 
+            app()->make('\Venturecraft\Revisionable\Revision')
+        );
+        
+        return $this->morphMany($actualClassname, 'revisionable');
     }
 
     /**
@@ -137,23 +141,23 @@ class Revisionable extends Eloquent
 
             $changes_to_record = $this->changedRevisionableFields();
 
+            $revision = app()->make('\Venturecraft\Revisionable\Revision');
             $revisions = array();
 
             foreach ($changes_to_record as $key => $change) {
                 $revisions[] = array(
-                    'revisionable_type'     => $this->getMorphClass(),
-                    'revisionable_id'       => $this->getKey(),
-                    'key'                   => $key,
-                    'old_value'             => array_get($this->originalData, $key),
-                    'new_value'             => $this->updatedData[$key],
-                    'user_id'               => $this->getSystemUserId(),
-                    'created_at'            => new \DateTime(),
-                    'updated_at'            => new \DateTime(),
+                    'revisionable_type' => $this->getMorphClass(),
+                    'revisionable_id' => $this->getKey(),
+                    'key' => $key,
+                    'old_value' => array_get($this->originalData, $key),
+                    'new_value' => $this->updatedData[$key],
+                    'user_id' => $this->getSystemUserId(),
+                    $revision::CREATED_AT => new \DateTime(),
+                    $revision::UPDATED_AT => new \DateTime(),
                 );
             }
-
+            
             if (count($revisions) > 0) {
-                $revision = new Revision;
                 \DB::table($revision->getTable())->insert($revisions);
             }
         }
@@ -175,18 +179,20 @@ class Revisionable extends Eloquent
 
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled))
         {
+            $revision = app()->make('\Venturecraft\Revisionable\Revision');
+            $revisions = array();
+            
             $revisions[] = array(
                 'revisionable_type' => $this->getMorphClass(),
                 'revisionable_id' => $this->getKey(),
-                'key' => self::CREATED_AT,
+                'key' => static::CREATED_AT,
                 'old_value' => null,
-                'new_value' => $this->{self::CREATED_AT},
+                'new_value' => $this->{static::CREATED_AT},
                 'user_id' => $this->getSystemUserId(),
-                'created_at' => new \DateTime(),
-                'updated_at' => new \DateTime(),
+                $revision::CREATED_AT => new \DateTime(),
+                $revision::UPDATED_AT => new \DateTime(),
             );
 
-            $revision = new Revision;
             \DB::table($revision->getTable())->insert($revisions);
 
         }
@@ -199,7 +205,11 @@ class Revisionable extends Eloquent
     {
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled)
             && $this->isSoftDelete()
-            && $this->isRevisionable($this->getDeletedAtColumn())) {
+            && $this->isRevisionable($this->getDeletedAtColumn())
+        ) {
+            $revision = app()->make('\Venturecraft\Revisionable\Revision');
+            $revisions = array();
+            
             $revisions[] = array(
                 'revisionable_type' => $this->getMorphClass(),
                 'revisionable_id' => $this->getKey(),
@@ -207,10 +217,10 @@ class Revisionable extends Eloquent
                 'old_value' => null,
                 'new_value' => $this->{$this->getDeletedAtColumn()},
                 'user_id' => $this->getSystemUserId(),
-                'created_at' => new \DateTime(),
-                'updated_at' => new \DateTime(),
+                $revision::CREATED_AT => new \DateTime(),
+                $revision::UPDATED_AT => new \DateTime(),
             );
-            $revision = new \Venturecraft\Revisionable\Revision;
+                
             \DB::table($revision->getTable())->insert($revisions);
         }
     }

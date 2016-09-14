@@ -1,5 +1,5 @@
 {
-    "name": "venturecraft/revisionable",
+    "name": "jaapmoolenaar.nl/revisionable",
     "license": "MIT",
     "description": "Keep a revision history for your models without thinking, created as a package for use with Laravel",
     "keywords": ["model", "laravel", "ardent", "revision", "history"],
@@ -8,6 +8,10 @@
         {
             "name": "Chris Duell",
             "email": "me@chrisduell.com"
+        },
+        {
+            "name": "Jaap Moolenaar",
+            "email": "jaap@jaapmoolenaar.nl"
         }
     ],
     "support": {
@@ -19,9 +23,6 @@
         "illuminate/support": "~4.0|~5.0|~5.1"
     },
     "autoload": {
-        "classmap": [
-            "src/migrations"
-        ],
         "psr-0": {
             "Venturecraft\\Revisionable": "src/"
         }

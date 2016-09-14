@@ -37,7 +37,7 @@ class FieldFormatter
                 $method = array_shift($parts);
 
                 if (method_exists(get_class(), $method)) {
-                    return self::$method($value, implode(':', $parts));
+                    return static::$method($value, implode(':', $parts));
                 }
                 break;
             }
@@ -58,7 +58,7 @@ class FieldFormatter
     {
         $value_set = isset($value) && $value != '';
 
-        return sprintf(self::boolean($value_set, $options), $value);
+        return sprintf(static::boolean($value_set, $options), $value);
     }
 
     /**

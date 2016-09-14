@@ -90,7 +90,11 @@ trait RevisionableTrait
      */
     public function revisionHistory()
     {
-        return $this->morphMany('\Venturecraft\Revisionable\Revision', 'revisionable');
+        $actualClassname = get_class( 
+            app()->make('\Venturecraft\Revisionable\Revision')
+        );
+        
+        return $this->morphMany($actualClassname, 'revisionable');
     }
 
     /**
@@ -102,8 +106,12 @@ trait RevisionableTrait
      */
     public static function classRevisionHistory($limit = 100, $order = 'desc')
     {
-        return \Venturecraft\Revisionable\Revision::where('revisionable_type', get_called_class())
-            ->orderBy('updated_at', $order)->limit($limit)->get();
+        $actualClassname = get_class( 
+            app()->make('\Venturecraft\Revisionable\Revision')
+        );
+        
+        return $actualClassname->where('revisionable_type', get_called_class())
+                ->orderBy('updated_at', $order)->limit($limit)->get();
     }
 
     /**
@@ -172,6 +180,7 @@ trait RevisionableTrait
 
             $changes_to_record = $this->changedRevisionableFields();
 
+            $revision = app()->make('\Venturecraft\Revisionable\Revision');
             $revisions = array();
 
             foreach ($changes_to_record as $key => $change) {
@@ -182,8 +191,8 @@ trait RevisionableTrait
                     'old_value' => array_get($this->originalData, $key),
                     'new_value' => $this->updatedData[$key],
                     'user_id' => $this->getSystemUserId(),
-                    'created_at' => new \DateTime(),
-                    'updated_at' => new \DateTime(),
+                    $revision::CREATED_AT => new \DateTime(),
+                    $revision::UPDATED_AT => new \DateTime(),
                 );
             }
 
@@ -194,7 +203,7 @@ trait RevisionableTrait
                         $delete->delete();
                     }
                 }
-                $revision = new Revision;
+                
                 \DB::table($revision->getTable())->insert($revisions);
                 \Event::fire('revisionable.saved', array('model' => $this, 'revisions' => $revisions));
             }
@@ -217,18 +226,20 @@ trait RevisionableTrait
 
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled))
         {
+            $revision = app()->make('\Venturecraft\Revisionable\Revision');
+            $revisions = array();
+            
             $revisions[] = array(
                 'revisionable_type' => $this->getMorphClass(),
                 'revisionable_id' => $this->getKey(),
-                'key' => self::CREATED_AT,
+                'key' => static::CREATED_AT,
                 'old_value' => null,
-                'new_value' => $this->{self::CREATED_AT},
+                'new_value' => $this->{static::CREATED_AT},
                 'user_id' => $this->getSystemUserId(),
-                'created_at' => new \DateTime(),
-                'updated_at' => new \DateTime(),
+                $revision::CREATED_AT => new \DateTime(),
+                $revision::UPDATED_AT => new \DateTime(),
             );
-
-            $revision = new Revision;
+                
             \DB::table($revision->getTable())->insert($revisions);
             \Event::fire('revisionable.created', array('model' => $this, 'revisions' => $revisions));
         }
@@ -244,6 +255,9 @@ trait RevisionableTrait
             && $this->isSoftDelete()
             && $this->isRevisionable($this->getDeletedAtColumn())
         ) {
+            $revision = app()->make('\Venturecraft\Revisionable\Revision');
+            $revisions = array();
+            
             $revisions[] = array(
                 'revisionable_type' => $this->getMorphClass(),
                 'revisionable_id' => $this->getKey(),
@@ -251,10 +265,10 @@ trait RevisionableTrait
                 'old_value' => null,
                 'new_value' => $this->{$this->getDeletedAtColumn()},
                 'user_id' => $this->getSystemUserId(),
-                'created_at' => new \DateTime(),
-                'updated_at' => new \DateTime(),
+                $revision::CREATED_AT => new \DateTime(),
+                $revision::UPDATED_AT => new \DateTime(),
             );
-            $revision = new \Venturecraft\Revisionable\Revision;
+            
             \DB::table($revision->getTable())->insert($revisions);
             \Event::fire('revisionable.deleted', array('model' => $this, 'revisions' => $revisions));
         }
