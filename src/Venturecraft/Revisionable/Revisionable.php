@@ -80,7 +80,7 @@ class Revisionable extends Eloquent
     public function revisionHistory()
     {
         $actualClassname = get_class( 
-            app()->make('\Venturecraft\Revisionable\Revision')
+            app()->make('Venturecraft\Revisionable\Revision')
         );
         
         return $this->morphMany($actualClassname, 'revisionable');
@@ -141,7 +141,7 @@ class Revisionable extends Eloquent
 
             $changes_to_record = $this->changedRevisionableFields();
 
-            $revision = app()->make('\Venturecraft\Revisionable\Revision');
+            $revision = app()->make('Venturecraft\Revisionable\Revision');
             $revisions = array();
 
             foreach ($changes_to_record as $key => $change) {
@@ -179,7 +179,7 @@ class Revisionable extends Eloquent
 
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled))
         {
-            $revision = app()->make('\Venturecraft\Revisionable\Revision');
+            $revision = app()->make('Venturecraft\Revisionable\Revision');
             $revisions = array();
             
             $revisions[] = array(
@@ -207,7 +207,7 @@ class Revisionable extends Eloquent
             && $this->isSoftDelete()
             && $this->isRevisionable($this->getDeletedAtColumn())
         ) {
-            $revision = app()->make('\Venturecraft\Revisionable\Revision');
+            $revision = app()->make('Venturecraft\Revisionable\Revision');
             $revisions = array();
             
             $revisions[] = array(

@@ -91,7 +91,7 @@ trait RevisionableTrait
     public function revisionHistory()
     {
         $actualClassname = get_class( 
-            app()->make('\Venturecraft\Revisionable\Revision')
+            app()->make('Venturecraft\Revisionable\Revision')
         );
         
         return $this->morphMany($actualClassname, 'revisionable');
@@ -107,7 +107,7 @@ trait RevisionableTrait
     public static function classRevisionHistory($limit = 100, $order = 'desc')
     {
         $actualClassname = get_class( 
-            app()->make('\Venturecraft\Revisionable\Revision')
+            app()->make('Venturecraft\Revisionable\Revision')
         );
         
         return $actualClassname->where('revisionable_type', get_called_class())
@@ -180,7 +180,7 @@ trait RevisionableTrait
 
             $changes_to_record = $this->changedRevisionableFields();
 
-            $revision = app()->make('\Venturecraft\Revisionable\Revision');
+            $revision = app()->make('Venturecraft\Revisionable\Revision');
             $revisions = array();
 
             foreach ($changes_to_record as $key => $change) {
@@ -226,7 +226,7 @@ trait RevisionableTrait
 
         if ((!isset($this->revisionEnabled) || $this->revisionEnabled))
         {
-            $revision = app()->make('\Venturecraft\Revisionable\Revision');
+            $revision = app()->make('Venturecraft\Revisionable\Revision');
             $revisions = array();
             
             $revisions[] = array(
@@ -255,7 +255,7 @@ trait RevisionableTrait
             && $this->isSoftDelete()
             && $this->isRevisionable($this->getDeletedAtColumn())
         ) {
-            $revision = app()->make('\Venturecraft\Revisionable\Revision');
+            $revision = app()->make('Venturecraft\Revisionable\Revision');
             $revisions = array();
             
             $revisions[] = array(
